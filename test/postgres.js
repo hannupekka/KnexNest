@@ -12,7 +12,9 @@ var knex = Knex({
 var testData = ''
 	+ 'CREATE TEMPORARY TABLE temp_user ('
 	+ '  id INTEGER PRIMARY KEY,'
-	+ '  name VARCHAR(100) NOT NULL'
+	+ '  name VARCHAR(100) NOT NULL,'
+	+ '  city VARCHAR(100),'
+	+ '  country VARCHAR(100)'
 	+ ');'
 	+ 'CREATE TEMPORARY TABLE temp_product ('
 	+ '  id INTEGER PRIMARY KEY,'
@@ -23,9 +25,9 @@ var testData = ''
 	+ '  user_id INTEGER NOT NULL,'
 	+ '  product_id INTEGER NOT NULL'
 	+ ');'
-	+ 'INSERT INTO temp_user (id, name) VALUES'
-	+ '  (1, \'Olga Chavez\'),'
-	+ '  (2, \'Carol Pierce\')'
+	+ 'INSERT INTO temp_user (id, name, city, country) VALUES'
+	+ '  (1, \'Olga Chavez\', null, \'Country A\'),'
+	+ '  (2, \'Carol Pierce\', \'City A\', \'Country B\')'
 	+ ';'
 	+ 'INSERT INTO temp_product (id, title) VALUES'
 	+ '  (1, \'Orange Fresh Wrap\'),'
@@ -48,6 +50,8 @@ knex.raw(testData)
 			.select(
 				'u.id     AS _id',
 				'u.name   AS _name',
+				'u.city   AS _livesIn_city',
+				'u.country   AS _livesIn_country',
 				'p.id     AS _has__id',
 				'p.title  AS _has__title'
 			)
@@ -66,7 +70,11 @@ knex.raw(testData)
 					{id: 1, title: 'Orange Fresh Wrap'},
 					{id: 2, title: 'Water Wetner'},
 					{id: 3, title: 'Mug Mitten'}
-				]
+				],
+				livesIn: {
+					city: null,
+					country: 'Country A'
+				}
 			},
 			{
 				id: 2,
@@ -74,11 +82,15 @@ knex.raw(testData)
 				has: [
 					{id: 2, title: 'Water Wetner'},
 					{id: 3, title: 'Mug Mitten'}
-				]
+				],
+				livesIn: {
+					city: 'City A',
+					country: 'Country B'
+				}
 			}
 		];
-		var strExpected = JSON.stringify(expected, null, '  ');
-		var strData = JSON.stringify(data, null, '  ');
+		var strExpected = JSON.stringify(expected, null, '');
+		var strData = JSON.stringify(data, null, '');
 		if (strData !== strExpected) {
 			throw Error('Expected\n' + strExpected + '\n to equal result of\n' + strData);
 		}
